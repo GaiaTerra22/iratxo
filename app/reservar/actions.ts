@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { createPublicClient } from "@/lib/supabase/public";
+import { sendRequestEmails } from "@/lib/email";
 
 const pathRegex =
   /^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(jpg|png|webp)$/;
@@ -49,6 +50,21 @@ export async function submitRequest(
   if (error) {
     console.error("Error guardando solicitud:", error.message);
     return { ok: false, error: "No se pudo enviar la solicitud. Inténtalo de nuevo." };
+  }
+
+  try {
+    await sendRequestEmails({
+      id: d.id,
+      name: d.name,
+      email: d.email,
+      phone: d.phone,
+      idea: d.idea,
+      zone: d.zone,
+      size: d.size,
+      photoCount: d.paths.length,
+    });
+  } catch (e) {
+    console.error("Error enviando emails:", e);
   }
 
   return { ok: true };
