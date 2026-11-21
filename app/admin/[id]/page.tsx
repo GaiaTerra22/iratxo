@@ -33,9 +33,9 @@ export default async function RequestPage({
       .from("references")
       .createSignedUrls(r.reference_paths, 3600);
     photos =
-      signed
-        ?.filter((s) => s.signedUrl)
-        .map((s) => ({ path: s.path ?? "", url: s.signedUrl })) ?? [];
+      signed?.flatMap((s) =>
+        s.signedUrl ? [{ path: s.path ?? "", url: s.signedUrl }] : []
+      ) ?? [];
   }
 
   return (
